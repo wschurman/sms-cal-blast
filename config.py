@@ -8,6 +8,13 @@ cfile = open(os.path.dirname(__file__) + '/config.json')
 config = json.load(cfile)
 cfile.close()
 
+cfile_private = open(os.path.dirname(__file__) + '/config_private.json')
+config_private = json.load(cfile_private)
+cfile_private.close()
+
+# merge
+config = dict(config.items() + config_private.items())
+
 def cf(key):
    """
    Gets a config value, removes unicode if necessary.
