@@ -1,5 +1,7 @@
 
 import httplib2
+from datetime import timedelta, datetime
+import pytz
 
 from apiclient.discovery import build
 from oauth2client.client import SignedJwtAssertionCredentials
@@ -29,6 +31,15 @@ class Calendar:
         self.service = build('calendar', 'v3', http=self.http)
 
     def get_events(self):
+
+        mintime = datetime.now(pytz.timezone('US/Eastern'))
+        maxtime = mintime + timedelta(days=10)  # debug, def. hours=1
+
         events = self.service.events().list(
-            calendarId=self.calendarId).execute(http=self.http)
+            calendarId=self.calendarId,
+            singleEvents=True,
+            timeMin=mintime.isoformat(),
+            timeMax=maxtime.isoformat()
+        ).execute(http=self.http)
+
         return events

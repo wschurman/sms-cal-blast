@@ -13,7 +13,7 @@ config_private = json.load(cfile_private)
 cfile_private.close()
 
 # merge
-config = dict(config.items() + config_private.items())
+config.update(config_private)
 
 def cf(key):
    """
@@ -30,8 +30,42 @@ def get(key):
 
 # Connect to SQLite
 
-connection = lite.connect('numbers.db')
+class SQLiteConnection:
 
-with connection:
-   cur = connection.cursor()
-   cur.execute("CREATE TABLE IF NOT EXISTS numbers(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, phone VARCHAR(20), provider VARCHAR(20))")
+   def __init__(self):
+      self.connection = lite.connect('numbers.db')
+      self.init_scripts()
+
+   def init_scripts(self):
+      self.execute_sql("CREATE TABLE IF NOT EXISTS numbers(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, phone VARCHAR(20), provider VARCHAR(20))", None)
+      self.execute_sql("CREATE TABLE IF NOT EXISTS sent_events(id TEXT NOT NULL PRIMARY KEY)", None)
+
+   def get_rows(self, sql, vals):
+      with self.connection:
+         cur = self.connection.cursor()
+         if vals:
+            cur.execute(sql, vals)
+         else:
+            cur.execute(sql)
+         return cur.fetchall()
+
+   def execute_sql(self, sql, vals):
+      with self.connection:
+         cur = self.connection.cursor()
+         if vals:
+            cur.execute(sql, vals)
+         else:
+            cur.execute(sql)
+
+   def insert_and_get_last_rowid(self, sql, vals):
+      with self.connection:
+         cur = self.connection.cursor()
+         if vals:
+            cur.execute(sql, vals)
+         else:
+            cur.execute(sql)
+         return cur.lastrowid
+
+   def close(self):
+      if self.connection:
+         self.connection.close()

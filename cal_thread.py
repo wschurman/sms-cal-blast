@@ -15,16 +15,40 @@ class CalThread(Thread):
 
     def run(self):
         # testing
-        print self.check_for_events()
+        self.check_for_events()
+        self.send_sms()
         return
 
         while not(self.stop):
             self.check_for_events()
             time.sleep(5)  # 2 seconds for now, switch to 600 for production
 
-    def check_for_events(self):
-        cal = Calendar(SERVICE_ACCOUNT_NAME, CALENDAR_ID)
-        return cal.get_events()
+    def fetch_events(self):
+        return Calendar(SERVICE_ACCOUNT_NAME, CALENDAR_ID).get_events()
 
-    def send_all_sms(self):
+    def check_for_events(self):
+        events = self.fetch_events()
+
+        if not 'items' in events:
+            print "No New Events"
+            return
+
+        self.sms_items = []
+
+        sqlite = config.SQLiteConnection()
+
+        for event in events['items']:
+            ins = (event['id'],)
+            inserted = sqlite.insert_and_get_last_rowid(
+                "INSERT OR IGNORE INTO sent_events (id) values (?)",
+                ins
+            )
+
+            if inserted:  # if not duplicate
+                self.sms_items.append(event)
+
+            # print event['id']
+            # print inserted
+
+    def send_sms(self):
         pass
