@@ -1,4 +1,6 @@
 
+from sms import SMS
+
 import config
 from threading import Thread
 from calendar import Calendar
@@ -51,4 +53,12 @@ class CalThread(Thread):
             # print inserted
 
     def send_sms(self):
-        pass
+        if len(self.sms_items) < 1:
+            return
+        sqlite = config.SQLiteConnection()
+        rows = sqlite.get_rows("SELECT phone, provider FROM numbers", None)
+        sqlite.close()
+
+        rows = dict(rows)
+
+        SMS(self.sms_items, rows).send_messages()

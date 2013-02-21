@@ -57,7 +57,7 @@ def list_numbers():
     rows = None
 
     sqlite = config.SQLiteConnection()
-    rows = sqlite.get_rows("SELECT phone, provider FROM numbers")
+    rows = sqlite.get_rows("SELECT phone, provider FROM numbers", None)
     sqlite.close()
 
     response.set_header('Content-Type', 'application/json')
