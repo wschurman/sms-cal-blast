@@ -1,0 +1,8 @@
+{
+  "SMTP_SENDER" : "",
+  "SMTP_SERVER" : "",
+  "SMTP_PORT" : 25,
+  "CALENDAR_ID" : "",
+  "SERVICE_ACCOUNT_NAME" : "",
+  "SERVICE_ACCOUNT_KEYFILE" : ""
+}

@@ -1,4 +1,5 @@
 
+import config
 import httplib2
 from datetime import timedelta, datetime
 import pytz
@@ -15,7 +16,11 @@ class Calendar:
         self.authenticate_service()
 
     def authenticate_service(self):
-        f = open("key.p12", "rb")
+        """
+        Authenticate with Google APIs using Google Service Accounts.
+        """
+        filename = config.cf("SERVICE_ACCOUNT_KEYFILE")
+        f = open(filename, "rb")
         key = f.read()
         f.close()
 
@@ -31,15 +36,22 @@ class Calendar:
         self.service = build('calendar', 'v3', http=self.http)
 
     def get_events(self):
-
+        """
+        Fetch events via API call.
+        """
         mintime = datetime.now(pytz.timezone('US/Eastern'))
-        maxtime = mintime + timedelta(days=10)  # debug, def. hours=1
+
+        if config.DEBUG:
+            maxtime = mintime + timedelta(days=10)
+        else:
+            maxtime = mintime + timedelta(hours=1)
 
         events = self.service.events().list(
             calendarId=self.calendarId,
             singleEvents=True,
             timeMin=mintime.isoformat(),
-            timeMax=maxtime.isoformat()
+            timeMax=maxtime.isoformat(),
+            orderBy="startTime"
         ).execute(http=self.http)
 
         return events
