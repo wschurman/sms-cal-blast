@@ -1,4 +1,5 @@
-import config
+
+from modules import *
 from cal_thread import CalThread
 
 import atexit
@@ -36,7 +37,7 @@ def add_number():
     if not r or not r["phone"] or not r["provider"]:
         abort(400, "Invalid call, bad request.")
     else:
-        sqlite = config.SQLiteConnection()
+        sqlite = SQLiteConnection()
         ins = (r["phone"], r["provider"])
         sqlite.execute_sql(
             "INSERT INTO numbers (phone, provider) values (?, ?)",
@@ -56,7 +57,7 @@ def list_numbers():
     """
     rows = None
 
-    sqlite = config.SQLiteConnection()
+    sqlite = SQLiteConnection()
     rows = sqlite.get_rows("SELECT phone, provider FROM numbers", None)
     sqlite.close()
 
@@ -93,7 +94,7 @@ calthread = CalThread()
 calthread.setDaemon(True)
 calthread.start()
 
-run(host=config.get("API_HOST"), port=config.get("API_PORT"))
+run(host=Config().get("API_HOST"), port=Config().get("API_PORT"))
 
 @atexit.register
 def goodbye():

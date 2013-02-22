@@ -1,13 +1,10 @@
 
-from sms import SMS
+from modules import *
 
-import config
-from threading import Thread
-from calendar import Calendar
 import time
+from threading import Thread
 
-CALENDAR_ID = config.cf("CALENDAR_ID")
-SERVICE_ACCOUNT_NAME = config.cf("SERVICE_ACCOUNT_NAME")
+config = Config()
 
 class CalThread(Thread):
 
@@ -16,7 +13,7 @@ class CalThread(Thread):
         self.stop = False
 
     def run(self):
-        debug = config.DEBUG
+        debug = config.DEBUG()
 
         while not(self.stop):
 
@@ -37,7 +34,7 @@ class CalThread(Thread):
         """
         Get events from Calendar
         """
-        return Calendar(SERVICE_ACCOUNT_NAME, CALENDAR_ID).get_events()
+        return Calendar(config).get_events()
 
     def pick(self, obj, valid_keys):
         """
@@ -59,14 +56,14 @@ class CalThread(Thread):
         events = self.fetch_events()
 
         if not 'items' in events:
-            if config.DEBUG:
+            if config.DEBUG():
                 print "No New Events"
             return
 
         valid_keys = ['summary', 'description', 'location', 'start', 'end']
         self.sms_items = []
 
-        sqlite = config.SQLiteConnection()
+        sqlite = SQLiteConnection()
 
         for event in events['items']:
             ins = (event['id'],)
@@ -84,10 +81,10 @@ class CalThread(Thread):
         """
         if len(self.sms_items) < 1:
             return
-        sqlite = config.SQLiteConnection()
+        sqlite = SQLiteConnection()
         rows = sqlite.get_rows("SELECT phone, provider FROM numbers", None)
         sqlite.close()
 
         rows = dict(rows)
 
-        SMS(self.sms_items, rows).send_messages()
+        SMS(config, self.sms_items, rows).send_messages()

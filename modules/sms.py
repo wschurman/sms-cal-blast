@@ -1,6 +1,5 @@
 
 import re
-import config
 import smtplib
 from datetime import timedelta, datetime
 import dateutil.parser
@@ -20,9 +19,16 @@ CARRIERS = {
 
 class SMS:
 
-    def __init__(self, events, numbers):
+    def __init__(self, config, events, numbers):
+        self.get_config(config)
         self.events = events
         self.numbers = self.fix_numbers(numbers)
+
+    def get_config(self, config):
+        self.DEBUG = config.DEBUG()
+        self.smtp_sender = config.cf("SMTP_SENDER")
+        self.server = config.cf("SMTP_SERVER")
+        self.port = config.cf("SMTP_PORT")
 
     def fix_numbers(self, numbers):
         """
@@ -78,7 +84,7 @@ class SMS:
             email_addresses.append(number + '@' + CARRIERS[carrier])
 
         recipients = sep.join(email_addresses)
-        sender = config.cf("SMTP_SENDER")
+        sender = self.smtp_sender
         subject = "Required Events"
         body = self.generate_message(self.events)
         headers = ["From: " + sender,
@@ -89,19 +95,18 @@ class SMS:
         headers = "\r\n".join(headers)
 
         try:
-            server, port = config.cf("SMTP_SERVER"), config.cf("SMTP_PORT")
-            smtp = smtplib.SMTP(server, port)
+            smtp = smtplib.SMTP(self.server, self.port)
 
-            if config.DEBUG:
-                smtp.set_debuglevel(config.DEBUG)
+            if self.DEBUG:
+                smtp.set_debuglevel(self.DEBUG)
 
             smtp.sendmail(sender, recipients, headers + "\r\n\r\n" + body)
             smtp.quit()
 
-            if config.DEBUG:
+            if self.DEBUG:
                 print "SEND: " + headers + "\r\n\r\n" + body
 
         except Exception as e:
-            if config.DEBUG:
+            if self.DEBUG:
                 print e
             print "Error: unable to send email"

@@ -1,5 +1,4 @@
 
-import config
 import httplib2
 from datetime import timedelta, datetime
 import pytz
@@ -10,17 +9,21 @@ from oauth2client.client import SignedJwtAssertionCredentials
 
 class Calendar:
 
-    def __init__(self, service_acct_name, cal_id):
-        self.service_account_name = service_acct_name
-        self.calendarId = cal_id
+    def __init__(self, config):
+        self.get_config(config)
         self.authenticate_service()
+
+    def get_config(self, config):
+        self.DEBUG = config.DEBUG()
+        self.keyfile = config.cf("SERVICE_ACCOUNT_KEYFILE")
+        self.service_account_name = config.cf("SERVICE_ACCOUNT_NAME")
+        self.calendarId = config.cf("CALENDAR_ID")
 
     def authenticate_service(self):
         """
         Authenticate with Google APIs using Google Service Accounts.
         """
-        filename = config.cf("SERVICE_ACCOUNT_KEYFILE")
-        f = open(filename, "rb")
+        f = open(self.keyfile, "rb")
         key = f.read()
         f.close()
 
@@ -41,7 +44,7 @@ class Calendar:
         """
         mintime = datetime.now(pytz.timezone('US/Eastern'))
 
-        if config.DEBUG:
+        if self.DEBUG:
             maxtime = mintime + timedelta(days=10)
         else:
             maxtime = mintime + timedelta(hours=1)
