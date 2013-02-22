@@ -2,9 +2,13 @@
 from modules import *
 
 import time
+from os.path import abspath, dirname
 from threading import Thread
 
-config = Config()
+config = Config(
+    cfile=dirname(abspath(__file__)) + '/config.json',
+    cfile_private=dirname(abspath(__file__)) + '/config_private.json'
+)
 
 class CalThread(Thread):
 
@@ -16,7 +20,6 @@ class CalThread(Thread):
         debug = config.DEBUG()
 
         while not(self.stop):
-
             if debug > 5:
                 print "Checking for events"
             self.check_for_events()

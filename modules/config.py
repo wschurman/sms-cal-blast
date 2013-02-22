@@ -1,23 +1,22 @@
 import json
-import os.path
 import sys
 
 class Config:
 
-    def __init__(self):
+    def __init__(self, cfile, cfile_private):
         # load cross language config
-        cfile = open(os.path.dirname(__file__) + '/../config.json')
-        config = json.load(cfile)
-        cfile.close()
-
-        cfile_private = open(os.path.dirname(__file__) + '/../config_private.json')
-        config_private = json.load(cfile_private)
-        cfile_private.close()
+        config = self.load_file(cfile)
+        config_private = self.load_file(cfile_private)
 
         # merge private
         config.update(config_private)
-
         self.config = config
+
+    def load_file(self, fname):
+        cfile = open(fname)
+        config = json.load(cfile)
+        cfile.close()
+        return config
 
     def cf(self, key):
         """

@@ -5,8 +5,14 @@ from cal_thread import CalThread
 import atexit
 import urllib
 import psutil, os, time, sys, json
+from os.path import abspath, dirname
 from threading import Thread, Lock
 from bottle import route, run, request, abort, get, post, delete, error, response
+
+config = Config(
+    cfile=dirname(abspath(__file__)) + '/config.json',
+    cfile_private=dirname(abspath(__file__)) + '/config_private.json'
+)
 
 @get('/status')
 def api_status():
@@ -90,11 +96,12 @@ def error501(error):
 def error404(error):
     return 'Query or Method Not Found'
 
+# start calendar querying and SMS sending
 calthread = CalThread()
 calthread.setDaemon(True)
 calthread.start()
 
-run(host=Config().get("API_HOST"), port=Config().get("API_PORT"))
+run(host=config.get("API_HOST"), port=config.get("API_PORT"))
 
 @atexit.register
 def goodbye():
