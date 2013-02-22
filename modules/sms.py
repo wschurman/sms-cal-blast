@@ -45,6 +45,22 @@ class SMS:
 
         return new_numbers
 
+    def validate_event(self, event):
+        try:
+            ret = True
+            ret &= 'start' in event
+            ret &= 'end' in event
+            ret &= 'dateTime' in event['start']
+            ret &= 'dateTime' in event['end']
+            ret &= 'summary' in event
+            ret &= 'description' in event
+
+            ret &= '#sms' in event['description']
+
+            return ret
+        except KeyError:
+            return False
+
     def generate_message(self, events):
         """
         Generates the body text of the email from events.
@@ -52,9 +68,7 @@ class SMS:
         msg_str = "Events in the next hour:\n"
 
         for event in events:
-            if (not event['start']['dateTime'] or
-               not event['end']['dateTime'] or
-               not event['summary']):
+            if not self.validate_event(event):
                continue
 
             start = dateutil.parser.parse(
