@@ -93,6 +93,9 @@ class SMS:
         sep = ', '
         email_addresses = []
 
+        if len(self.numbers) < 1:
+            return
+
         for number in self.numbers:
             carrier = self.numbers[number]
             email_addresses.append(number + '@' + CARRIERS[carrier])

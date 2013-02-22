@@ -89,5 +89,7 @@ class CalThread(Thread):
         sqlite.close()
 
         rows = dict(rows)
+        if len(rows) < 1:
+            return
 
         SMS(config, self.sms_items, rows).send_messages()
