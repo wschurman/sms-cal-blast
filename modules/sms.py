@@ -13,8 +13,7 @@ CARRIERS = {
     "tmobile"   :   "tmomail.net",
     "uscellular":   "email.uscc.net",
     "verizon"   :   "vtext.com",
-    "virgin"    :   "vmobl.com",
-    "googlevoice":  "txt.voice.google.com"
+    "virgin"    :   "vmobl.com"
 }
 
 
@@ -120,7 +119,7 @@ class SMS:
             if self.DEBUG:
                 smtp.set_debuglevel(self.DEBUG)
 
-            smtp.sendmail(sender, recipients, headers + "\r\n\r\n" + body)
+            smtp.sendmail(sender, email_addresses, headers + "\r\n\r\n" + body)
             smtp.quit()
 
             if self.DEBUG:
