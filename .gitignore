@@ -2,3 +2,4 @@ config_private.json
 numbers.db
 goauth.dat
 *.p12
+test.py

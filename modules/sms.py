@@ -13,7 +13,8 @@ CARRIERS = {
     "tmobile"   :   "tmomail.net",
     "uscellular":   "email.uscc.net",
     "verizon"   :   "vtext.com",
-    "virgin"    :   "vmobl.com"
+    "virgin"    :   "vmobl.com",
+    "googlevoice":  "txt.voice.google.com"
 }
 
 
@@ -40,6 +41,10 @@ class SMS:
             carrier = numbers[number]
             new_num = re.sub('[^0-9]+', '', number)
 
+            # remove 1
+            if len(new_num) > 10 and new_num[0] == '1':
+                new_num = new_num[1:]
+
             if carrier in CARRIERS:
                 new_numbers[new_num] = carrier
 
@@ -65,7 +70,7 @@ class SMS:
         """
         Generates the body text of the email from events.
         """
-        msg_str = "Events in the next hour:\n"
+        msg_str = "Required Events:\r\n"
 
         for event in events:
             if not self.validate_event(event):
@@ -78,7 +83,7 @@ class SMS:
                         event['end']['dateTime']
                     ).astimezone(pytz.timezone('US/Eastern'))
 
-            msg_str += "%s (%s-%s)\n" % (
+            msg_str += "%s (%s-%s)\r\n" % (
                 event['summary'],
                 start.strftime("%I:%M%p"),
                 end.strftime("%I:%M%p")
@@ -102,13 +107,11 @@ class SMS:
 
         recipients = sep.join(email_addresses)
         sender = self.smtp_sender
-        subject = "Required Events"
+        subject = "Reminder"
         body = self.generate_message(self.events)
         headers = ["From: " + sender,
                    "Subject: " + subject,
-                   "To: " + recipients,
-                   "MIME-Version: 1.0",
-                   "Content-Type: text/html"]
+                   "To: " + recipients]
         headers = "\r\n".join(headers)
 
         try:
