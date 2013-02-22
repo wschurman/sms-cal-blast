@@ -13,7 +13,8 @@ CARRIERS = {
     "tmobile"   :   "tmomail.net",
     "uscellular":   "email.uscc.net",
     "verizon"   :   "vtext.com",
-    "virgin"    :   "vmobl.com"
+    "virgin"    :   "vmobl.com",
+    "email"     :   ""
 }
 
 
@@ -102,7 +103,10 @@ class SMS:
 
         for number in self.numbers:
             carrier = self.numbers[number]
-            email_addresses.append(number + '@' + CARRIERS[carrier])
+            if CARRIERS[carrier]:
+                email_addresses.append(number + '@' + CARRIERS[carrier])
+            else:
+                email_addresses.append(number)
 
         recipients = sep.join(email_addresses)
         sender = self.smtp_sender

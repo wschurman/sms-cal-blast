@@ -44,7 +44,7 @@ class Calendar:
         """
         mintime = datetime.now(pytz.timezone('US/Eastern'))
 
-        if self.DEBUG:
+        if self.DEBUG > 5:
             maxtime = mintime + timedelta(days=10)
         else:
             maxtime = mintime + timedelta(hours=1)
