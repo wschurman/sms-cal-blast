@@ -28,7 +28,7 @@ class CalThread(Thread):
                 print "Sending SMS"
             self.send_sms()
 
-            if debug:
+            if debug > 6:
                 time.sleep(10)
             else:
                 time.sleep(600)
