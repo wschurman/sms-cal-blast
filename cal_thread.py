@@ -15,6 +15,7 @@ class CalThread(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.stop = False
+        self.sms_items = []
 
     def run(self):
         debug = config.DEBUG()
