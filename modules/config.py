@@ -1,16 +1,11 @@
+
 import json
-import sys
 
 class Config:
 
-    def __init__(self, cfile, cfile_private):
+    def __init__(self, cfile):
         # load cross language config
-        config = self.load_file(cfile)
-        config_private = self.load_file(cfile_private)
-
-        # merge private
-        config.update(config_private)
-        self.config = config
+        self.config = self.load_file(cfile)
 
     def load_file(self, fname):
         cfile = open(fname)
@@ -35,3 +30,6 @@ class Config:
 
     def DEBUG(self):
         return self.cf("DEBUG")
+
+    def DEBUG_SMTP(self):
+        return self.cf("DEBUG_SMTP")

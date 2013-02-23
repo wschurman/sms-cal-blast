@@ -43,11 +43,7 @@ class Calendar:
         Fetch events via API call.
         """
         mintime = datetime.now(pytz.timezone('US/Eastern'))
-
-        if self.DEBUG > 5:
-            maxtime = mintime + timedelta(days=10)
-        else:
-            maxtime = mintime + timedelta(hours=1)
+        maxtime = mintime + timedelta(hours=1)
 
         events = self.service.events().list(
             calendarId=self.calendarId,

@@ -2,16 +2,13 @@
 from modules import *
 from cal_thread import CalThread
 
-import atexit
-import urllib
-import psutil, os, time, sys, json
+import atexit, psutil, os, time, sys, json
 from os.path import abspath, dirname
 from threading import Thread, Lock
 from bottle import route, run, request, abort, get, post, delete, error, response
 
 config = Config(
-    cfile=dirname(abspath(__file__)) + '/config.json',
-    cfile_private=dirname(abspath(__file__)) + '/config_private.json'
+    cfile=dirname(abspath(__file__)) + '/config_private.json'
 )
 
 @get('/status')
@@ -70,6 +67,30 @@ def list_numbers():
     response.set_header('Content-Type', 'application/json')
     return dict([ list(x) for x in rows ])
 
+@get('/cal')
+def get_cal():
+    """
+    Test of the Calendar class via API.
+    Path: GET /cal
+    """
+    response.set_header('Content-Type', 'application/json')
+    return Calendar(config).get_events()
+
+@get('/sent')
+def get_sent():
+    """
+    List the IDs of the sent events.
+    Path: GET /sent
+    """
+    rows = None
+
+    sqlite = SQLiteConnection()
+    rows = sqlite.get_rows("SELECT id FROM sent_events", None)
+    sqlite.close()
+
+    response.set_header('Content-Type', 'application/json')
+
+    return {"sent": [ x for x in rows ]}
 
 @get('/server_stats')
 def get_server_stats():

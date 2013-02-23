@@ -1,6 +1,5 @@
 
-import re
-import smtplib
+import re, time, smtplib
 from datetime import timedelta, datetime
 import dateutil.parser
 import pytz
@@ -27,6 +26,7 @@ class SMS:
 
     def get_config(self, config):
         self.DEBUG = config.DEBUG()
+        self.DEBUG_SMTP = config.DEBUG_SMTP()
         self.smtp_sender = config.cf("SMTP_SENDER")
         self.server = config.cf("SMTP_SERVER")
         self.port = config.cf("SMTP_PORT")
@@ -50,22 +50,6 @@ class SMS:
 
         return new_numbers
 
-    def validate_event(self, event):
-        try:
-            ret = True
-            ret &= 'start' in event
-            ret &= 'end' in event
-            ret &= 'dateTime' in event['start']
-            ret &= 'dateTime' in event['end']
-            ret &= 'summary' in event
-            ret &= 'description' in event
-
-            ret &= '#sms' in event['description']
-
-            return ret
-        except KeyError:
-            return False
-
     def generate_message(self, events):
         """
         Generates the body text of the email from events.
@@ -73,9 +57,6 @@ class SMS:
         msg_str = "Required Events:\r\n"
 
         for event in events:
-            if not self.validate_event(event):
-               continue
-
             start = dateutil.parser.parse(
                         event['start']['dateTime']
                     ).astimezone(pytz.timezone('US/Eastern'))
@@ -98,9 +79,11 @@ class SMS:
         sep = ', '
         email_addresses = []
 
+        # no numbers, do not email
         if len(self.numbers) < 1:
             return
 
+        # convert to email addresses via carrier SMS email addresses
         for number in self.numbers:
             carrier = self.numbers[number]
             if CARRIERS[carrier]:
@@ -108,6 +91,7 @@ class SMS:
             else:
                 email_addresses.append(number)
 
+        # create headers
         recipients = sep.join(email_addresses)
         sender = self.smtp_sender
         subject = "Reminder"
@@ -117,19 +101,22 @@ class SMS:
                    "To: " + recipients]
         headers = "\r\n".join(headers)
 
+        # send emails
         try:
             smtp = smtplib.SMTP(self.server, self.port)
 
-            if self.DEBUG:
-                smtp.set_debuglevel(self.DEBUG)
+            if self.DEBUG_SMTP:
+                smtp.set_debuglevel(10)
 
             smtp.sendmail(sender, email_addresses, headers + "\r\n\r\n" + body)
             smtp.quit()
 
-            if self.DEBUG:
-                print "SEND: " + headers + "\r\n\r\n" + body
+            print ("SEND: " + time.strftime("%a, %d %b %Y %H:%M:%S") + "\r\n" +
+                    headers + "\r\n\r\n" + body)
+            return self.events
 
         except Exception as e:
             if self.DEBUG:
                 print e
             print "Error: unable to send email"
+            return None
