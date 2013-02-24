@@ -3,3 +3,4 @@ numbers.db
 goauth.dat
 *.p12
 test.py
+sms.log

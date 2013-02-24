@@ -1,15 +1,16 @@
 
 from modules import *
-from cal_thread import CalThread
 
-import atexit, psutil, os, time, sys, json
+import psutil
+import os
+import time
 from os.path import abspath, dirname
-from threading import Thread, Lock
-from bottle import route, run, request, abort, get, post, delete, error, response
+from bottle import run, request, abort, get, post, error, response
 
 config = Config(
     cfile=dirname(abspath(__file__)) + '/config_private.json'
 )
+
 
 @get('/status')
 def api_status():
@@ -19,9 +20,10 @@ def api_status():
     """
     response.set_header('Content-Type', 'application/json')
     return {
-        'status':'online',
-        'servertime':time.time(),
+        'status': 'online',
+        'servertime': time.time(),
     }
+
 
 @get('/hello')
 def hello():
@@ -29,6 +31,7 @@ def hello():
     TODO: Remove
     """
     return "Hello, World!"
+
 
 @post('/')
 def add_number():
@@ -50,7 +53,8 @@ def add_number():
 
         response.status = "201 Added Number"
         response.set_header('Content-Type', 'application/json')
-        return {"success":1}
+        return {"success": 1}
+
 
 @get('/')
 def list_numbers():
@@ -65,7 +69,8 @@ def list_numbers():
     sqlite.close()
 
     response.set_header('Content-Type', 'application/json')
-    return dict([ list(x) for x in rows ])
+    return dict([list(x) for x in rows])
+
 
 @get('/cal')
 def get_cal():
@@ -75,6 +80,7 @@ def get_cal():
     """
     response.set_header('Content-Type', 'application/json')
     return Calendar(config).get_events()
+
 
 @get('/sent')
 def get_sent():
@@ -90,7 +96,8 @@ def get_sent():
 
     response.set_header('Content-Type', 'application/json')
 
-    return {"sent": [ x for x in rows ]}
+    return {"sent": [x for x in rows]}
+
 
 @get('/server_stats')
 def get_server_stats():
@@ -101,32 +108,27 @@ def get_server_stats():
     p = psutil.Process(os.getpid())
     response.set_header('Content-Type', 'application/json')
     return {
-        'status':'online',
-        'servertime':time.time(),
-        "num_threads":p.get_num_threads(),
-        "cpu_percent":p.get_cpu_percent(interval=0),
-        "memory":p.get_memory_info(),
-        "connections":p.get_connections(kind='all'),
+        'status': 'online',
+        'servertime': time.time(),
+        "num_threads": p.get_num_threads(),
+        "cpu_percent": p.get_cpu_percent(interval=0),
+        "memory": p.get_memory_info(),
+        "connections": p.get_connections(kind='all'),
     }
+
 
 @error(501)
 def error501(error):
     return "API Method Not Implemented"
 
+
 @error(404)
 def error404(error):
     return 'Query or Method Not Found'
 
-# start calendar querying and SMS sending
-calthread = CalThread()
-calthread.setDaemon(True)
-calthread.start()
 
-run(host=config.get("API_HOST"), port=config.get("API_PORT"))
+def main():
+    run(host=config.get("API_HOST"), port=config.get("API_PORT"))
 
-@atexit.register
-def goodbye():
-    calthread.stop = True
-    calthread.join()
-
-    print "Goodbye."
+if __name__ == '__main__':
+    main()

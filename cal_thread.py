@@ -23,6 +23,7 @@ class CalThread(Thread):
             self.check_for_events()
             self.send_sms()
             time.sleep(30)
+        return
 
     def check_for_events(self):
         """
