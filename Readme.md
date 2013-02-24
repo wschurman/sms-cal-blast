@@ -36,8 +36,14 @@ Setup
     - SERVICE_ACCOUNT_NAME : Email Address from service account in API console.
     - SERVICE_ACCOUNT_KEYFILE : The name of the service account keyfile.
 
+To run the Calendar and SMS blaster thread:
 ```shell
-python server.py
+./app.py
+```
+
+To run the HTTP API for number insertion:
+```shell
+./app.py --api-mode
 ```
 
 Contributors
