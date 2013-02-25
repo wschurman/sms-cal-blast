@@ -10,6 +10,13 @@ Dependencies
 * PIP
 * SQLite3
 
+ToDo
+====
+
+- [ ] Add support for multiple granularities of events (i.e. required, optional, suggested)
+  and modify SMS sending to reflect different categories.
+- [ ] Add Google Docs support to retrieve phone numbers from a spreadsheet.
+
 Installation & Usage
 ====================
 
