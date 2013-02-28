@@ -3,6 +3,8 @@ Test utils.py functions with unittest.
 """
 
 import unittest
+from mock import MagicMock
+from smscalblast.modules.test import MockSQLiteConnection
 from smscalblast.scripts import utils
 
 valid_event = {
@@ -97,11 +99,21 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(len(test), 0)
 
     def test_validate_event(self):
-        self.assertTrue(utils.validate_event(valid_event))
-        self.assertFalse(utils.validate_event(invalid_event_1))
-        self.assertFalse(utils.validate_event(invalid_event_2))
-        self.assertFalse(utils.validate_event(invalid_event_3))
-        self.assertFalse(utils.validate_event(invalid_event_4))
+        sqlite = MockSQLiteConnection()
+        self.assertTrue(utils.validate_event(sqlite, valid_event))
+        self.assertFalse(utils.validate_event(sqlite, invalid_event_1))
+        self.assertFalse(utils.validate_event(sqlite, invalid_event_2))
+        self.assertFalse(utils.validate_event(sqlite, invalid_event_3))
+        self.assertFalse(utils.validate_event(sqlite, invalid_event_4))
+        sqlite.close()  # not necessary, but good to keep for compatibility
+
+        sqlite = MockSQLiteConnection()
+        sqlite.get_rows = MagicMock()
+        sqlite.get_rows.return_value = [('1234')]
+        self.assertFalse(utils.validate_event(sqlite, invalid_event_5))
+        sqlite.get_rows.assert_called_with(
+            'SELECT id FROM sent_events WHERE id = ?', ('1234',)
+        )
 
     def tearDown(self):
         pass

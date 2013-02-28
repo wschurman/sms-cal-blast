@@ -1,5 +1,4 @@
-
-from smscalblast.modules import *
+# Provides util functions for sms-blaster
 
 
 def pick(obj, valid_keys):
@@ -15,7 +14,7 @@ def pick(obj, valid_keys):
     return result
 
 
-def validate_event(event):
+def validate_event(sqlite, event):
     """
     Validate the event fields and ensure that it has not been sent before.
     """
@@ -31,15 +30,11 @@ def validate_event(event):
 
         ret &= '#sms' in event['description']
 
-        sqlite = SQLiteConnection()
-
         ins = (event['id'],)
         rows = sqlite.get_rows(
             "SELECT id FROM sent_events WHERE id = ?",
             ins
         )
-
-        sqlite.close()
 
         ret &= (len(rows) == 0)
 
@@ -49,27 +44,21 @@ def validate_event(event):
         return False
 
 
-def get_phone_numbers():
+def get_phone_numbers(sqlite):
     """
     Gets the phone numbers from DB.
     """
-    sqlite = SQLiteConnection()
     rows = sqlite.get_rows("SELECT phone, provider FROM numbers", None)
-    sqlite.close()
     return dict(rows)
 
 
-def update_sent_events(events):
+def update_sent_events(sqlite, events):
     """
     Adds sent event IDs to the DB.
     """
-    sqlite = SQLiteConnection()
-
     for event in events:
         ins = (event['id'],)
         sqlite.execute_sql(
             "INSERT OR IGNORE INTO sent_events (id) values (?)",
             ins
         )
-
-    sqlite.close()

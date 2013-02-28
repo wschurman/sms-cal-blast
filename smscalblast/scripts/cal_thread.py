@@ -44,9 +44,13 @@ class CalThread(Thread):
         valid_keys = ['summary', 'description', 'location', 'start', 'end', 'id']
         self.sms_items = []
 
+        sqlite = SQLiteConnection()
+
         for event in events['items']:
-            if utils.validate_event(event):
+            if utils.validate_event(sqlite, event):
                 self.sms_items.append(utils.pick(event, valid_keys))
+
+        sqlite.close()
 
     def send_sms(self):
         """
@@ -61,7 +65,9 @@ class CalThread(Thread):
                 print "No events to send"
             return
 
-        numbers = utils.get_phone_numbers()
+        sqlite = SQLiteConnection()
+        numbers = utils.get_phone_numbers(sqlite)
+        sqlite.close()
 
         # no phone numbers
         if len(numbers) < 1:
@@ -73,4 +79,6 @@ class CalThread(Thread):
         sent_events = SMS(config, self.sms_items, numbers).send_messages()
 
         # update DB
-        utils.update_sent_events(sent_events)
+        sqlite = SQLiteConnection()
+        utils.update_sent_events(sqlite, sent_events)
+        sqlite.close()
