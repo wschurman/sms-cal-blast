@@ -42,25 +42,28 @@ class SMS:
             new_num = re.sub('[^0-9]+', '', number)
 
             # remove 1
-            if len(new_num) > 10 and new_num[0] == '1':
+            if len(new_num) == 11 and new_num[0] == '1':
                 new_num = new_num[1:]
+
+            if not len(new_num) == 10:
+                continue
 
             if carrier in CARRIERS:
                 new_numbers[new_num] = carrier
 
         return new_numbers
 
-    def generate_message(self, events):
+    def generate_message(self):
         """
         Generates the body text of the email from events.
         """
         msg_str = "Required Events:\r\n"
 
-        for event in events:
+        for event in self.events:
             start = dateutil.parser.parse(
                         event['start']['dateTime']
                     ).astimezone(pytz.timezone('US/Eastern'))
-            end   = dateutil.parser.parse(
+            end = dateutil.parser.parse(
                         event['end']['dateTime']
                     ).astimezone(pytz.timezone('US/Eastern'))
 
@@ -95,7 +98,7 @@ class SMS:
         recipients = sep.join(email_addresses)
         sender = self.smtp_sender
         subject = "Reminder"
-        body = self.generate_message(self.events)
+        body = self.generate_message()
         headers = ["From: " + sender,
                    "Subject: " + subject,
                    "To: " + recipients]

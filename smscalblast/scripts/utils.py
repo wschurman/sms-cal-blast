@@ -1,5 +1,5 @@
 
-from modules import *
+from smscalblast.modules import *
 
 
 def pick(obj, valid_keys):
@@ -21,6 +21,7 @@ def validate_event(event):
     """
     try:
         ret = True
+        ret &= 'id' in event
         ret &= 'start' in event
         ret &= 'end' in event
         ret &= 'dateTime' in event['start']

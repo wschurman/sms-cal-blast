@@ -53,6 +53,14 @@ To run the HTTP API for number insertion:
 ./app.py --api-mode
 ```
 
+Unit Testing
+============
+Run the following command from the root directory of the app (sms-cal-blast)
+
+```shell
+python -m unittest discover smscalblast '*_test.py'
+```
+
 Contributors
 =============
 

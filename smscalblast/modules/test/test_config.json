@@ -1,0 +1,12 @@
+{
+  "DEBUG" : 1,
+  "DEBUG_SMTP" : 1,
+  "API_HOST" : "0.0.0.0",
+  "API_PORT" : 1337,
+  "SMTP_SENDER" : "test@test.com",
+  "SMTP_SERVER" : "localhost",
+  "SMTP_PORT" : 1025,
+  "CALENDAR_ID" : "test",
+  "SERVICE_ACCOUNT_NAME" : "test",
+  "SERVICE_ACCOUNT_KEYFILE" : ""
+}

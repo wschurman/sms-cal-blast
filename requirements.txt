@@ -5,3 +5,4 @@ google-api-python-client==1.0
 python-dateutil==1.5
 pytz==2012j
 pyOpenSSL==0.13
+mock==1.0.1

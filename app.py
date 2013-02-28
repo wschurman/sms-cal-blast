@@ -8,10 +8,8 @@ Blasts SMS messages to people right before required events.
 import sys
 import atexit
 import time
-import api_server
 from argparse import ArgumentParser
-from threading import Thread
-from cal_thread import CalThread
+from smscalblast.scripts import CalThread, api_server
 
 calthread = None
 

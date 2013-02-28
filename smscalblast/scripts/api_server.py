@@ -1,14 +1,14 @@
 
-from modules import *
+from smscalblast.modules import *
 
 import psutil
 import os
 import time
-from os.path import abspath, dirname
+from os.path import abspath
 from bottle import run, request, abort, get, post, error, response
 
 config = Config(
-    cfile=dirname(abspath(__file__)) + '/config_private.json'
+    cfile=abspath('config_private.json')
 )
 
 

@@ -1,14 +1,15 @@
 
-from modules import *
+from smscalblast.modules import *
 import utils
 
 import time
-from os.path import abspath, dirname
+from os.path import abspath
 from threading import Thread
 
 config = Config(
-    cfile=dirname(abspath(__file__)) + '/config_private.json'
+    cfile=abspath('config_private.json')
 )
+
 
 class CalThread(Thread):
 
@@ -45,7 +46,7 @@ class CalThread(Thread):
 
         for event in events['items']:
             if utils.validate_event(event):
-               self.sms_items.append(utils.pick(event, valid_keys))
+                self.sms_items.append(utils.pick(event, valid_keys))
 
     def send_sms(self):
         """
