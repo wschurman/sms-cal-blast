@@ -15,7 +15,7 @@ ToDo
 
 - [ ] Add support for multiple granularities of events (i.e. required, optional, suggested)
   and modify SMS sending to reflect different categories.
-- [ ] Add Google Docs support to retrieve phone numbers from a spreadsheet.
+- [ ] Partially revert change allowing numbers to be stored in SQLite or Google Spreadsheet.
 
 Installation & Usage
 ====================
@@ -39,6 +39,7 @@ Setup
     - SMTP_SENDER : The from email address in the messages
     - SMTP_SERVER : The smtp server you would like to use
     - SMTP_PORT : The smtp port you would like to use
+    - FILE_ID : The ID of the spreadsheet file containing the numbers. Oddly specific.
     - CALENDAR_ID : The Google Calendar ID, gotten from Calendar Settings page in Google Calendar
     - SERVICE_ACCOUNT_NAME : Email Address from service account in API console.
     - SERVICE_ACCOUNT_KEYFILE : The name of the service account keyfile.
