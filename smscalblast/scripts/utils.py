@@ -46,7 +46,7 @@ def validate_event(sqlite, event):
 
 def get_phone_numbers(sqlite):
     """
-    Gets the phone numbers from DB.
+    DEPRECATED: Gets the phone numbers from DB.
     """
     rows = sqlite.get_rows("SELECT phone, provider FROM numbers", None)
     return dict(rows)

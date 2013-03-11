@@ -1,6 +1,6 @@
 
-import re, time, smtplib
-from datetime import timedelta, datetime
+import time
+import smtplib
 import dateutil.parser
 import pytz
 
@@ -22,7 +22,7 @@ class SMS:
     def __init__(self, config, events, numbers):
         self.get_config(config)
         self.events = events
-        self.numbers = self.fix_numbers(numbers)
+        self.numbers = numbers
 
     def get_config(self, config):
         self.DEBUG = config.DEBUG()
@@ -30,28 +30,6 @@ class SMS:
         self.smtp_sender = config.cf("SMTP_SENDER")
         self.server = config.cf("SMTP_SERVER")
         self.port = config.cf("SMTP_PORT")
-
-    def fix_numbers(self, numbers):
-        """
-        Filters non-numrical characters out of phone numbers.
-        """
-        new_numbers = dict()
-
-        for number in numbers:
-            carrier = numbers[number]
-            new_num = re.sub('[^0-9]+', '', number)
-
-            # remove 1
-            if len(new_num) == 11 and new_num[0] == '1':
-                new_num = new_num[1:]
-
-            if not len(new_num) == 10:
-                continue
-
-            if carrier in CARRIERS:
-                new_numbers[new_num] = carrier
-
-        return new_numbers
 
     def generate_message(self):
         """
