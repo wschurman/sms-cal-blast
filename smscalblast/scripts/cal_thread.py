@@ -65,9 +65,7 @@ class CalThread(Thread):
                 print "No events to send"
             return
 
-        sqlite = SQLiteConnection()
-        numbers = utils.get_phone_numbers(sqlite)
-        sqlite.close()
+        numbers = Spreadsheet(config).get_numbers()
 
         # no phone numbers
         if len(numbers) < 1:

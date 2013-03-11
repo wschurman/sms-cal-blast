@@ -62,14 +62,10 @@ def list_numbers():
     Lists all numbers.
     Path: GET /
     """
-    rows = None
-
-    sqlite = SQLiteConnection()
-    rows = sqlite.get_rows("SELECT phone, provider FROM numbers", None)
-    sqlite.close()
+    ss = Spreadsheet(config)
 
     response.set_header('Content-Type', 'application/json')
-    return dict([list(x) for x in rows])
+    return ss.get_numbers()
 
 
 @get('/cal')
