@@ -3,6 +3,10 @@ import httplib2
 from datetime import timedelta, datetime
 import pytz
 
+from smscalblast.scripts import utils
+from smscalblast.modules.submodules import Event
+from smscalblast.modules.submodules import SQLiteConnection
+
 from apiclient.discovery import build
 from oauth2client.client import SignedJwtAssertionCredentials
 
@@ -45,12 +49,29 @@ class Calendar:
         mintime = datetime.now(pytz.timezone('US/Eastern'))
         maxtime = mintime + timedelta(hours=1)
 
-        events = self.service.events().list(
+        raw_events = self.service.events().list(
             calendarId=self.calendarId,
             singleEvents=True,
             timeMin=mintime.isoformat(),
             timeMax=maxtime.isoformat(),
             orderBy="startTime"
         ).execute(http=self.http)
+
+        if not 'items' in raw_events:
+            if self.DEBUG:
+                print "No Events Returned"
+            return []
+
+        events = []
+        sqlite = SQLiteConnection()
+
+        for event in raw_events['items']:
+            if utils.validate_event(sqlite, event):
+                events.append(Event(event))
+
+        for e in events:
+            print e.debug_str()
+
+        sqlite.close()
 
         return events

@@ -1,5 +1,7 @@
 # Provides util functions for sms-blaster
 
+import re
+
 
 def pick(obj, valid_keys):
     """
@@ -12,6 +14,23 @@ def pick(obj, valid_keys):
             result[key] = obj[key]
 
     return result
+
+
+def fix_number(number):
+    """
+    Filters non-numrical characters out of phone numbers.
+    """
+
+    new_num = re.sub('[^0-9]+', '', number)
+
+    # remove 1
+    if len(new_num) == 11 and new_num[0] == '1':
+        new_num = new_num[1:]
+
+    if not len(new_num) == 10:
+        return False
+
+    return new_num
 
 
 def validate_event(sqlite, event):
@@ -57,7 +76,7 @@ def update_sent_events(sqlite, events):
     Adds sent event IDs to the DB.
     """
     for event in events:
-        ins = (event['id'],)
+        ins = (event.id,)
         sqlite.execute_sql(
             "INSERT OR IGNORE INTO sent_events (id) values (?)",
             ins

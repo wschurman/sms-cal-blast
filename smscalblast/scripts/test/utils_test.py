@@ -4,7 +4,7 @@ Test utils.py functions with unittest.
 
 import unittest
 from mock import MagicMock
-from smscalblast.modules.test import MockSQLiteConnection
+from smscalblast.modules.submodules.test import MockSQLiteConnection
 from smscalblast.scripts import utils
 
 valid_event = {

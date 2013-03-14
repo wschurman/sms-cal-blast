@@ -54,10 +54,6 @@ class TestSMS(unittest.TestCase):
 
         self.assertEqual(len(fixed_numbers), 3)
 
-    def test_generate_message(self):
-        message = self.sms.generate_message()
-        self.assertEqual(message, test_message)
-
     def tearDown(self):
         self.sms = None
 

@@ -2,24 +2,16 @@
 import httplib2
 import StringIO
 import csv
-import re
+
+from smscalblast.scripts import utils
+from smscalblast.modules.submodules import Person
+
+from smscalblast.modules.submodules.message_generator import CARRIERS
 
 from apiclient.discovery import build
 from oauth2client.client import SignedJwtAssertionCredentials
 
-FIELD_NAMES = ['timestamp', 'email', 'phone', 'unlimited_texts', 'provider']
-
-CARRIERS = {
-    "alltel"    :   "text.wireless.alltel.com",
-    "att"       :   "txt.att.net",
-    "nextel"    :   "messaging.nextel.com",
-    "sprint"    :   "messaging.sprintpcs.com",
-    "tmobile"   :   "tmomail.net",
-    "uscellular":   "email.uscc.net",
-    "verizon"   :   "vtext.com",
-    "virgin"    :   "vmobl.com",
-    "email"     :   ""
-}
+FIELD_NAMES = ['timestamp', 'email', 'phone', 'unlimited_texts', 'carrier']
 
 
 class Spreadsheet:
@@ -80,48 +72,29 @@ class Spreadsheet:
         Validate the csv row.
         """
         return (row.get('unlimited_texts') == "yes" and
-                row.get('provider') in CARRIERS)
-
-    def fix_numbers(self, numbers):
-        """
-        Filters non-numrical characters out of phone numbers.
-        """
-        new_numbers = dict()
-
-        for number in numbers:
-            carrier = numbers[number]
-            new_num = re.sub('[^0-9]+', '', number)
-
-            # remove 1
-            if len(new_num) == 11 and new_num[0] == '1':
-                new_num = new_num[1:]
-
-            if not len(new_num) == 10:
-                continue
-
-            if carrier in CARRIERS:
-                new_numbers[new_num] = carrier
-
-        return new_numbers
+                row.get('carrier') in CARRIERS)
 
     def parse_csv(self, csv_str):
         """
-        Parse csv_str and return a set of valid numbers.
+        Parse csv_str and return a set of Person objects.
         """
-        ret = dict()
+        ret = []
         reader = csv.DictReader(StringIO.StringIO(csv_str),
                                 fieldnames=FIELD_NAMES)
         for row in reader:
             if self.validate_row(row):
-                ret[row.get('phone')] = row.get('provider')
+                p = utils.fix_number(row.get('phone'))
+                if not p:
+                    continue
+                row['phone'] = p
+                ret.append(Person(row))
 
-        return self.fix_numbers(ret)
+        return ret
 
-    def get_numbers(self):
+    def get_people(self):
         """
-        Fetch phone numbers via API call.
+        Fetch People from spreadsheet via API call.
         """
-
         gfile = self.service.files().get(
             fileId=self.fileId
         ).execute(http=self.http)
@@ -130,6 +103,7 @@ class Spreadsheet:
         data = self.parse_csv(file_data)
 
         if self.DEBUG:
-            print data
+            for p in data:
+                print p
 
         return data

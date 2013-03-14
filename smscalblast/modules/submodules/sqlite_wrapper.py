@@ -16,16 +16,16 @@ class SQLiteConnection:
         Initialize scripts for application.
         """
         self.execute_sql(
-            "CREATE TABLE IF NOT EXISTS numbers" \
-            "(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " \
-            "phone VARCHAR(20), " \
+            "CREATE TABLE IF NOT EXISTS numbers"
+            "(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+            "phone VARCHAR(20), "
             "provider VARCHAR(20))"
-        , None)
+            , None)
 
         self.execute_sql(
-            "CREATE TABLE IF NOT EXISTS sent_events" \
+            "CREATE TABLE IF NOT EXISTS sent_events"
             "(id TEXT NOT NULL PRIMARY KEY)"
-        , None)
+            , None)
 
     def get_rows(self, sql, vals):
         """

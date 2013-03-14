@@ -1,5 +1,6 @@
 
 from smscalblast.modules import *
+from smscalblast.modules.submodules import *
 import utils
 
 import time
@@ -16,65 +17,43 @@ class CalThread(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.stop = False
-        self.sms_items = []
+        self.events = []
         self.DEBUG = config.DEBUG()
 
     def run(self):
         while not(self.stop):
-            self.check_for_events()
-            self.send_sms()
+            self.do_check()
             time.sleep(30)
         return
 
-    def check_for_events(self):
-        """
-        Checks for events, inserts them into 'seen' db table, constructs
-        dictionary with only select keys.
-        """
-        if self.DEBUG:
-            print "Checking for events"
-
-        events = Calendar(config).get_events()
-
-        if not 'items' in events:
-            if self.DEBUG:
-                print "No Events Returned"
-            return
-
-        valid_keys = ['summary', 'description', 'location', 'start', 'end', 'id']
-        self.sms_items = []
-
-        sqlite = SQLiteConnection()
-
-        for event in events['items']:
-            if utils.validate_event(sqlite, event):
-                self.sms_items.append(utils.pick(event, valid_keys))
-
-        sqlite.close()
-
-    def send_sms(self):
+    def do_check(self):
         """
         Gets phone numbers and sends sms messages via SMS class.
         """
         if self.DEBUG:
-            print "Sending SMS"
+            print "Checking for events"
+
+        self.events = Calendar(config).get_events()
 
         # no items to send
-        if len(self.sms_items) < 1:
+        if len(self.events) < 1:
             if self.DEBUG:
                 print "No events to send"
             return
 
-        numbers = Spreadsheet(config).get_numbers()
+        if self.DEBUG:
+            print "Sending SMS"
+
+        people = Spreadsheet(config).get_people()
 
         # no phone numbers
-        if len(numbers) < 1:
+        if len(people) < 1:
             if debug:
                 print "No numbers to send to"
             return
 
         # send events
-        sent_events = SMS(config, self.sms_items, numbers).send_messages()
+        sent_events = SMS(config, self.events, people).send_messages()
 
         # update DB
         sqlite = SQLiteConnection()
