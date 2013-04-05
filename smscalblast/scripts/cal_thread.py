@@ -25,7 +25,7 @@ class CalThread(Thread):
             try:
                 self.do_check()
             except:
-                print "error({0}): {1}".format(e.errno, e.strerror)
+                print "error, continuing..."
             time.sleep(30)
         return
 
