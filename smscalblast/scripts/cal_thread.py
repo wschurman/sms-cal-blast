@@ -24,11 +24,8 @@ class CalThread(Thread):
         while not(self.stop):
             try:
                 self.do_check()
-            except HttpError:
-                print "HTTP error({0}): {1}".format(e.errno, e.strerror)
             except:
-                print "Unexpected error"
-                raise
+                print "error({0}): {1}".format(e.errno, e.strerror)
             time.sleep(30)
         return
 
